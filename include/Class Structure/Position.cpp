@@ -22,4 +22,9 @@ public:
     z_pos = (one.z_velocity/2*ms*ms) + (one.z_c*ms);
   }
 
+  void add_position(position p) {
+    x_pos += p.x_pos;
+    y_pos += p.y_pos;
+    z_pos += p.z_pos;
+  }
 };
