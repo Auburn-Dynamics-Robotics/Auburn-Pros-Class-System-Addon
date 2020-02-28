@@ -8,7 +8,7 @@ private:
   Train rt = Train(pros::Motor(1),pros::Motor(1),0);
   Train lt = Train(pros::Motor(1),pros::Motor(1),0);
   Train hd = Train(pros::Motor(1),pros::Motor(1),0);
-  Inertia is = pros::Imu(1);
+  Inertia is = Inertia(pros::Imu(1),2);
 
   bool hasInertia=false;
   int type = 0;

@@ -11,15 +11,16 @@ public:
   std::string y_equation;
   std::string z_equation;
 
-  void integrate(velocity one, position prev, int ms) {
+  void integrate(velocity one, position prev, float ms) {
+    velocity temp;
+    ms = ms/1000;
+    x_equation = std::to_string(one.x_velocity) + "X + " + std::to_string(prev.x_pos);
+    y_equation = std::to_string(one.y_velocity) + "X + " + std::to_string(prev.y_pos);
+    z_equation = std::to_string(one.z_velocity) + "X + " + std::to_string(prev.z_pos);
 
-    x_equation = std::to_string(one.x_velocity/2) + "X^2 + " + std::to_string(one.x_c) + "X + " + std::to_string(prev.x_pos);
-    y_equation = std::to_string(one.y_velocity/2) + "X^2 + " + std::to_string(one.y_c) + "X + " + std::to_string(prev.y_pos);
-    z_equation = std::to_string(one.z_velocity/2) + "X^2 + " + std::to_string(one.z_c) + "X + " + std::to_string(prev.z_pos);
-
-    x_pos = (one.x_velocity/2*ms*ms) + (one.x_c*ms);
-    y_pos = (one.y_velocity/2*ms*ms) + (one.y_c*ms);
-    z_pos = (one.z_velocity/2*ms*ms) + (one.z_c*ms);
+    x_pos = (one.x_velocity*ms) + (prev.x_pos);
+    y_pos = (one.y_velocity*ms) + (prev.y_pos);
+    z_pos = (one.z_velocity*ms) + (prev.z_pos);
   }
 
   void add_position(position p) {

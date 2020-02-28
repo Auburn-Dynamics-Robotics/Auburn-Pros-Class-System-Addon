@@ -15,8 +15,10 @@ public:
   std::string y_equation;
   std::string z_equation;
 
-  void integrate(acceleration one, velocity prev, int ms) {
+  void integrate(acceleration one, velocity prev, float ms) {
 
+    ms = ms/1000;
+    
     x_c=prev.x_velocity;
     y_c=prev.y_velocity;
     z_c=prev.z_velocity;

@@ -2,7 +2,7 @@
 #include "Class Structure/global.hpp"
 
 pros::Imu inertia_sensor(15);
-Inertia inertia(inertia_sensor);
+Inertia inertia(inertia_sensor,0.2);
 
 void left_button_press() {
 

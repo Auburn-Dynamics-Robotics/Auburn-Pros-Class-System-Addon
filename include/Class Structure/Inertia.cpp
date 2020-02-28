@@ -14,17 +14,14 @@ private:
     position prev_pos;
 
     float g_to_inch = 386.0886;
+    pros::c::imu_accel_s_t initial_value;
+
+    float threshold;
+    bool calibrating = true;
 
 
-  bool calibrating = true;
-
-  
 public:
-  Inertia(pros::Imu a): i(a) {
-    this->init();
-    acc.convert_to_inches(i.get_accel());
-    vel.integrate(acc, prev_vel, 0);
-    pos.integrate(vel, prev_pos, 0);
+  Inertia(pros::Imu a, float it): i(a), threshold(it) {
   }
 
   void init() {
@@ -32,15 +29,46 @@ public:
     while(i.is_calibrating()) {
       pros::delay(2);
     }
+    initial_value = i.get_accel();
+    initial_value.x = floor((initial_value.x*10)+0.5)/10;
+    initial_value.y = floor((initial_value.y*10)+0.5)/10;
+    initial_value.z = floor((initial_value.z*10)+0.5)/10;
+    pros::c::imu_accel_s_t abc = i.get_accel();
+    abc.x = floor((abc.x*10)+0.5)/10;
+    abc.y = floor((abc.y*10)+0.5)/10;
+    abc.z = floor((abc.z*10)+0.5)/10;
+    acc.convert_to_inches(abc,initial_value);
+    vel.integrate(acc, prev_vel, 0);
+    pos.integrate(vel, prev_pos, 0);
     calibrating = false;
   }
 
+  bool is_initializing() {
+    if(i.is_calibrating()) {
+      return true;
+    }
+    return false;
+  }
   void update(int msDelay) {
     prev_accel=acc;
     prev_vel=vel;
     prev_pos=pos;
-
-    acc.convert_to_inches(i.get_accel());
+    pros::c::imu_accel_s_t cr = i.get_accel();
+    cr.x = floor((cr.x*10)+0.5)/10;
+    cr.y = floor((cr.y*10)+0.5)/10;
+    cr.z = floor((cr.z*10)+0.5)/10;
+/*
+    if(cr.x < threshold || cr.x > -threshold) {
+      cr.x=0;
+    }
+    if(cr.y < threshold || cr.y > -threshold) {
+      cr.y=0;
+    }
+    if(cr.z < threshold || cr.z > -threshold) {
+      cr.z=0;
+    }
+*/
+    acc.convert_to_inches(cr,initial_value);
     vel.integrate(acc, prev_vel,msDelay);
     pos.integrate(vel, prev_pos, msDelay);
   }
@@ -60,4 +88,7 @@ public:
     return pos;
   }
 
+  pros::c::imu_accel_s_t raw_accel() {
+    return i.get_accel();
+  }
 };
