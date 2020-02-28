@@ -5,15 +5,15 @@
 
 class Base {
 private:
-  Train rt = Train(pros::Motor(1),pros::Motor(1),0);
-  Train lt = Train(pros::Motor(1),pros::Motor(1),0);
-  Train hd = Train(pros::Motor(1),pros::Motor(1),0);
+  Train rt = Train(pros::Motor(1),0,false);
+  Train lt = Train(pros::Motor(1),0,false);
+  Train hd = Train(pros::Motor(1),0,false);
   Inertia is = Inertia(pros::Imu(1),2);
 
   bool hasInertia=false;
   int type = 0;
   float current_pos;
-
+  std::string forward_axis = "x";
 
   void tfr(int a) {
     rt.forward_rpm(a);
@@ -61,23 +61,59 @@ private:
   }
 
 
-  void tfi(int dist, int b) {
-    int one_tile = rt.get_one_tile();
+  void tfi(float tiles, int b) {
+    float dist = tiles*24;
+
+    position start = is.get_position();
+    position moved=is.get_position();
+
+    float net_moved = moved.x_pos-start.x_pos;
+    if(forward_axis =="z") {
+      net_moved = moved.z_pos-start.z_pos;
+    }
+
     rt.forward_rpm(b);
     lt.forward_rpm(b);
 
-    //Inertia will integrate position; wait until inertia has reached distance "dist"
+    while(net_moved < dist) {
+      pros::delay(5);
+      is.update(5);
+      moved=is.get_position();
+      net_moved = moved.x_pos-start.x_pos;
+      if(forward_axis=="z") {
+        net_moved = moved.z_pos-start.z_pos;
+      }
+    }
 
     rt.stop();
     lt.stop();
   }
 
-  void tbi(int dist, int b) {
-    int one_tile = rt.get_one_tile();
-    rt.forward_rpm(b);
-    lt.forward_rpm(b);
 
-    //Inertia will integrate position; wait until inertia has reached distance "dist"
+
+  void tbi(int tiles, int b) {
+    float dist = -tiles*24;
+
+    position start = is.get_position();
+    position moved=is.get_position();
+
+    float net_moved = moved.x_pos-start.x_pos;
+    if(forward_axis =="z") {
+      net_moved = moved.z_pos-start.z_pos;
+    }
+
+    rt.backward_rpm(b);
+    lt.backward_rpm(b);
+
+    while(net_moved > dist) {
+      pros::delay(5);
+      is.update(5);
+      moved=is.get_position();
+      net_moved = moved.x_pos-start.x_pos;
+      if(forward_axis=="z") {
+        net_moved = moved.z_pos-start.z_pos;
+      }
+    }
 
     rt.stop();
     lt.stop();
@@ -213,5 +249,14 @@ public:
       return;
     }
     tri(degrees, rpm);
+  }
+
+
+
+  bool is_stopped() {
+    if(rt.is_stopped() && lt.is_stopped() && hd.is_stopped()) {
+      return true;
+    }
+    return false;
   }
 };
