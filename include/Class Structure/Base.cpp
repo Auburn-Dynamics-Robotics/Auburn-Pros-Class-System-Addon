@@ -1,5 +1,4 @@
-#include "main.h"
-#include "X-Drive.cpp"
+#include "TYPES.h"
 #include "Train.cpp"
 #include "Inertia.cpp"
 
@@ -13,7 +12,7 @@ private:
   bool hasInertia=false;
   int type = 0;
   float current_pos;
-  std::string forward_axis = "x";
+  int forward_axis = Z_AXIS;
 
   void tfr(int a) {
     rt.forward_rpm(a);
@@ -61,14 +60,14 @@ private:
   }
 
 
-  void tfi(float tiles, int b) {
-    float dist = tiles*24;
+  void tfi(float inch, int b) {
+    float dist = inch;
 
     position start = is.get_position();
     position moved=is.get_position();
 
     float net_moved = moved.x_pos-start.x_pos;
-    if(forward_axis =="z") {
+    if(forward_axis==Z_AXIS) {
       net_moved = moved.z_pos-start.z_pos;
     }
 
@@ -80,7 +79,7 @@ private:
       is.update(5);
       moved=is.get_position();
       net_moved = moved.x_pos-start.x_pos;
-      if(forward_axis=="z") {
+      if(forward_axis==Z_AXIS) {
         net_moved = moved.z_pos-start.z_pos;
       }
     }
@@ -91,14 +90,14 @@ private:
 
 
 
-  void tbi(int tiles, int b) {
-    float dist = -tiles*24;
+  void tbi(int inch, int b) {
+    float dist = -inch;
 
     position start = is.get_position();
     position moved=is.get_position();
 
     float net_moved = moved.x_pos-start.x_pos;
-    if(forward_axis =="z") {
+    if(forward_axis ==Z_AXIS) {
       net_moved = moved.z_pos-start.z_pos;
     }
 
@@ -110,7 +109,7 @@ private:
       is.update(5);
       moved=is.get_position();
       net_moved = moved.x_pos-start.x_pos;
-      if(forward_axis=="z") {
+      if(forward_axis==Z_AXIS) {
         net_moved = moved.z_pos-start.z_pos;
       }
     }
@@ -119,24 +118,59 @@ private:
     lt.stop();
   }
 
-  void hri(int dist, int b) {
-    int one_tile = hd.get_one_tile();
+  void hri(int inch, int b) {
+    float dist = inch;
+
+    position start = is.get_position();
+    position moved=is.get_position();
+
+    float net_moved = moved.z_pos-start.z_pos;
+    if(forward_axis ==Z_AXIS) {
+      net_moved = moved.x_pos-start.x_pos;
+    }
+
     hd.forward_rpm(b);
 
-    //Inertia will integrate position; wait until inertia has reached distance "dist"
+    while(net_moved < dist) {
+      pros::delay(5);
+      is.update(5);
+      moved=is.get_position();
+      net_moved = moved.z_pos-start.z_pos;
+      if(forward_axis==Z_AXIS) {
+        net_moved = moved.x_pos-start.x_pos;
+      }
+    }
 
     hd.stop();
   }
 
-  void hli(int dist, int b) {
-    int one_tile = hd.get_one_tile();
+  void hli(int inch, int b) {
+    float dist = -inch;
+
+    position start = is.get_position();
+    position moved= is.get_position();
+
+    float net_moved = moved.z_pos-start.z_pos;
+    if(forward_axis ==Z_AXIS) {
+      net_moved = moved.x_pos-start.x_pos;
+    }
+
     hd.backward_rpm(b);
 
-    //Inertia will integrate position; wait until inertia has reached distance "dist"
+    while(net_moved > dist) {
+      pros::delay(5);
+      is.update(5);
+      moved=is.get_position();
+      net_moved = moved.z_pos-start.z_pos;
+      if(forward_axis==Z_AXIS) {
+        net_moved = moved.x_pos-start.x_pos;
+      }
+    }
 
     hd.stop();
 
   }
+
 
   void tri(int dist, int b) {
     int one_tile = rt.get_one_tile();
@@ -149,40 +183,80 @@ private:
     lt.stop();
   }
 
+
+
+/*
+
+
+
+PUBLIC FUNCTIONS
+
+
+
+*/
+
+
+
 public:
+
   Base(Train r, Train l): rt(r), lt(l) {
     type=2;
-  };
-  Base(Train r, Train l, Inertia s): rt(r), lt(l), is(s) {
+  }
+  Base(Train r, Train l, Inertia s, int fw): rt(r), lt(l), is(s), forward_axis(fw) {
     type=2;
     hasInertia=true;
-  };
+  }
   Base(Train r, Train l, Train h): rt(r), lt(l), hd(h) {
     type=3;
-  };
-  Base(Train r, Train l, Train h, Inertia s): rt(r), lt(l), hd(h), is(s) {
+  }
+  Base(Train r, Train l, Train h, Inertia s, int fw): rt(r), lt(l), hd(h), is(s), forward_axis(fw) {
     type=3;
     hasInertia=true;
-  };
+  }
 
-  void forward_rpm(int rpm) {
+
+
+
+
+  void move(int direction, int rpm) {
+    if(direction==FORWARD) {
       tfr(rpm);
-  }
-
-  void backward_rpm(int rpm) {
+    } else if(direction==BACKWARD) {
       tbr(rpm);
-  }
-
-
-  void right_rpm(int rpm) {
-    if(type==3) {
+    } else if(direction==RIGHT && type==3) {
       hrr(rpm);
+    } else if(direction==LEFT && type==3) {
+      hlr(rpm);
     }
   }
 
-  void left_rpm(int rpm) {
-    if(type==3) {
-      hlr(rpm);
+
+
+  void move(int type, int direction, int distance, int units, int rpm) {
+    if(units==TILES) {
+      distance=distance*24;
+    }
+
+    if(type==INERTIA) {
+      if(direction==FORWARD) {
+        tfi(distance,rpm);
+      } else if(direction==BACKWARD) {
+        tbi(distance,rpm);
+      } else if(direction==RIGHT && type==3) {
+        hri(distance,rpm);
+      } else if(direction==LEFT && type==3) {
+        hli(distance,rpm);
+      }
+    } else if(type==ENCODER) {
+      if(direction==FORWARD) {
+        tft(distance,rpm);
+      } else if(direction==BACKWARD) {
+        tbt(distance,rpm);
+      } else if(direction==RIGHT && type==3) {
+        hrt(distance,rpm);
+      } else if(direction==LEFT && type==3) {
+        hlt(distance,rpm);
+      }
     }
   }
 
@@ -191,58 +265,11 @@ public:
   }
 
 
-  void forward_encoder(float tiles, int rpm) {
-      tft(tiles,rpm);
-  }
-
-  void backward_encoder(float tiles, int rpm) {
-      tbt(tiles,rpm);
-  }
-
-  void left_encoder(float tiles, int rpm) {
-    if(type==3) {
-      hrt(tiles,rpm);
-    }
-  }
-
-  void right_encoder(float tiles, int rpm) {
-    if(type==3) {
-      hlt(tiles,rpm);
-    }
-  }
 
   void turn_encoder(int degrees, int rpm) {
     trt(degrees,rpm);
   }
 
-
-  void forward_inertia(float tiles, int rpm) {
-    if(!hasInertia) {
-      return;
-    }
-    tfi(tiles,rpm);
-  }
-
-  void backward_inertia(float tiles, int rpm) {
-    if(!hasInertia) {
-      return;
-    }
-    tbi(tiles,rpm);
-  }
-
-  void right_inertia(float tiles, int rpm) {
-    if(!hasInertia) {
-      return;
-    }
-    hri(tiles,rpm);
-  }
-
-  void left_inertia(float tiles, int rpm) {
-    if(!hasInertia) {
-      return;
-    }
-    hli(tiles,rpm);
-  }
 
   void turn_inertia(int degrees, int rpm) {
     if(!hasInertia) {
@@ -251,6 +278,12 @@ public:
     tri(degrees, rpm);
   }
 
+
+  void stop() {
+    rt.stop();
+    lt.stop();
+    hd.stop();
+  }
 
 
   bool is_stopped() {

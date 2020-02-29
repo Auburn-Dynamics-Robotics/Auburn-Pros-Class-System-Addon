@@ -2,11 +2,21 @@
 #include "Class Structure/global.hpp"
 
 void opcontrol() {
-  inertia.init();
-  while(inertia.is_initializing()) {
-    pros::delay(20);
-  }
   while(true) {
+    
+    if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_UP)) {
+      base.move(FORWARD, 100);
+    } else if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_RIGHT)) {
+      base.move(RIGHT, 100);
+    } else if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_DOWN)) {
+      base.move(BACKWARD, 100);
+    } else if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_LEFT)) {
+      base.move(LEFT, 100);
+    } else {
+      base.stop();
+    }
+
+
     inertia.update(10);
     acceleration current_accel = inertia.get_acceleration();
     velocity current_vel = inertia.get_velocity();

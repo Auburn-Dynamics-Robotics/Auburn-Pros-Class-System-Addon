@@ -1,5 +1,6 @@
 #include "main.h"
 #include "Base.cpp"
+#include "X-Drive.cpp"
 #ifndef GLOBALS
 #define GLOBALS
 
@@ -11,4 +12,7 @@ extern XDrive x_drive;
 extern Train right_train, left_train, h_drive;
 extern Base base;
 extern Inertia inertia;
+
+extern pros::Controller controller;
+
 #endif

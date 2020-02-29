@@ -1,0 +1,15 @@
+2/28/20
+- Developed Theoretical inertia-based base movement code
+- Added "TYPES.h" file which contains natural language variables for integers
+  - Directions
+    - FORWARD = 1
+    - BACKWARD = 2
+    - RIGHT = 3
+    - LEFT = 4
+  - Distance Type
+    - INERTIA = 1
+    - ENCODER = 2
+  -
+- Consolidated public base class methods into one overloaded method
+  - move(int direction, int rpm)
+  - move(int type, int direction, int distance, int units, int rpm)

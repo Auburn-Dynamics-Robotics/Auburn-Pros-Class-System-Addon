@@ -1,4 +1,5 @@
-bin/initialize.cpp.o: src/initialize.cpp include/main.h include/api.h \
+bin/initialize.cpp.o: src/initialize.cpp include/apcsa.h \
+ include/Class\ Structure/global.hpp include/main.h include/api.h \
  include/pros/adi.h include/pros/colors.h include/pros/imu.h \
  include/pros/llemu.h include/display/lvgl.h include/display/lv_version.h \
  include/display/lv_misc/lv_log.h include/display/lv_conf.h \
@@ -67,12 +68,16 @@ bin/initialize.cpp.o: src/initialize.cpp include/main.h include/api.h \
  include/pros/llemu.h include/pros/misc.hpp include/pros/misc.h \
  include/pros/motors.hpp include/pros/motors.h include/pros/rtos.hpp \
  include/pros/rtos.h include/pros/vision.hpp include/pros/vision.h \
- include/Class\ Structure/global.hpp include/Class\ Structure/Base.cpp \
- include/Class\ Structure/X-Drive.cpp include/Class\ Structure/Train.cpp \
- include/Class\ Structure/Inertia.cpp \
+ include/Class\ Structure/Base.cpp include/Class\ Structure/TYPES.h \
+ include/Class\ Structure/Train.cpp include/Class\ Structure/Inertia.cpp \
  include/Class\ Structure/Position.cpp \
  include/Class\ Structure/Velocity.cpp \
- include/Class\ Structure/Acceleration.cpp
+ include/Class\ Structure/Acceleration.cpp \
+ include/Class\ Structure/X-Drive.cpp
+
+include/apcsa.h:
+
+include/Class\ Structure/global.hpp:
 
 include/main.h:
 
@@ -332,11 +337,9 @@ include/pros/vision.hpp:
 
 include/pros/vision.h:
 
-include/Class\ Structure/global.hpp:
-
 include/Class\ Structure/Base.cpp:
 
-include/Class\ Structure/X-Drive.cpp:
+include/Class\ Structure/TYPES.h:
 
 include/Class\ Structure/Train.cpp:
 
@@ -347,3 +350,5 @@ include/Class\ Structure/Position.cpp:
 include/Class\ Structure/Velocity.cpp:
 
 include/Class\ Structure/Acceleration.cpp:
+
+include/Class\ Structure/X-Drive.cpp:
