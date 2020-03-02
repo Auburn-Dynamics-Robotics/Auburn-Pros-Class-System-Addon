@@ -1,6 +1,6 @@
 #include "TYPES.h"
 #include "Position.cpp"
-
+#include "Gyro.cpp"
 class Inertia {
 private:
     pros::Imu i;
@@ -8,10 +8,12 @@ private:
     acceleration acc;
     velocity vel;
     position pos;
+    gyro gy;
 
     acceleration prev_accel;
     velocity prev_vel;
     position prev_pos;
+    gyro prev_gy;
 
     float g_to_inch = 386.0886;
     pros::c::imu_accel_s_t initial_value;
@@ -44,16 +46,20 @@ public:
     calibrating = false;
   }
 
+
   bool is_initializing() {
     if(i.is_calibrating()) {
       return true;
     }
     return false;
   }
+
+
   void update(int msDelay) {
     prev_accel=acc;
     prev_vel=vel;
     prev_pos=pos;
+    prev_gy = gy;
     pros::c::imu_accel_s_t cr = i.get_accel();
     cr.x = floor((cr.x*10)+0.5)/10;
     cr.y = floor((cr.y*10)+0.5)/10;
@@ -71,6 +77,7 @@ public:
     acc.convert_to_inches(cr,initial_value);
     vel.integrate(acc, prev_vel,msDelay);
     pos.integrate(vel, prev_pos, msDelay);
+    gy.set(i.get_gyro_rate());
   }
 
   acceleration get_acceleration() {
@@ -88,7 +95,18 @@ public:
     return pos;
   }
 
+  gyro get_gyro() {
+    return gy;
+  }
+
   pros::c::imu_accel_s_t raw_accel() {
     return i.get_accel();
+  }
+
+  bool validate(float axis) {
+    if(axis == X_AXIS || axis == Y_AXIS || axis == Z_AXIS) {
+      return true;
+    }
+    return false;
   }
 };

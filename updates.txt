@@ -1,3 +1,14 @@
+3/1/20
+
+- Added support for multiple orientations of inertia sensor. Forward/Backwards, Left/Right,
+  and Up/Down axis must be declared when initializing a Base with an Inertia Sensor.
+  If an invalid axis is provided then the Base will go to the defaults below:
+  - Forward/Backward Axis: Z_AXIS
+  - Left/Right Axis: X_AXIS
+  - Up/Down Axis: Y_AXIS
+- Began developing Gyroscopic turning.
+
+
 2/28/20
 - Developed Theoretical inertia-based base movement code
 - Added "TYPES.h" file which contains natural language variables for integers

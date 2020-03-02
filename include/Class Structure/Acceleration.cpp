@@ -1,8 +1,8 @@
 #include "main.h"
-
+#include "TYPES.h"
 class acceleration {
 public:
-  
+
   float x_accel_inch=0;
   float y_accel_inch=0;
   float z_accel_inch=0;
@@ -14,5 +14,15 @@ public:
     y_accel_inch = (a.y-b.y)*conversion_constant;
     z_accel_inch = (a.z-b.y)*conversion_constant;
   }
-
+  float get_axis(int axis) {
+    if(axis == X_AXIS) {
+      return x_accel_inch;
+    } else if(axis == Y_AXIS) {
+      return y_accel_inch;
+    } else if(axis == Z_AXIS) {
+      return z_accel_inch;
+    } else {
+      return INVALID_AXIS;
+    }
+  }
 };

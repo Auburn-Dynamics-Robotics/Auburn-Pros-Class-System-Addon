@@ -13,6 +13,8 @@ private:
   int type = 0;
   float current_pos;
   int forward_axis = Z_AXIS;
+  int side_axis = X_AXIS;
+  int up_axis = Y_AXIS;
 
   void tfr(int a) {
     rt.forward_rpm(a);
@@ -60,16 +62,27 @@ private:
   }
 
 
+
+
+
+/*
+
+
+
+INERTIA MOVEMENT SECTION
+
+
+
+*/
+
+
   void tfi(float inch, int b) {
     float dist = inch;
 
     position start = is.get_position();
     position moved=is.get_position();
 
-    float net_moved = moved.x_pos-start.x_pos;
-    if(forward_axis==Z_AXIS) {
-      net_moved = moved.z_pos-start.z_pos;
-    }
+    float net_moved = moved.get_axis(forward_axis)-start.get_axis(forward_axis);
 
     rt.forward_rpm(b);
     lt.forward_rpm(b);
@@ -78,10 +91,7 @@ private:
       pros::delay(5);
       is.update(5);
       moved=is.get_position();
-      net_moved = moved.x_pos-start.x_pos;
-      if(forward_axis==Z_AXIS) {
-        net_moved = moved.z_pos-start.z_pos;
-      }
+      net_moved = moved.get_axis(forward_axis)-start.get_axis(forward_axis);
     }
 
     rt.stop();
@@ -94,12 +104,9 @@ private:
     float dist = -inch;
 
     position start = is.get_position();
-    position moved=is.get_position();
+    position moved = is.get_position();
 
-    float net_moved = moved.x_pos-start.x_pos;
-    if(forward_axis ==Z_AXIS) {
-      net_moved = moved.z_pos-start.z_pos;
-    }
+    float net_moved = moved.get_axis(forward_axis)-start.get_axis(forward_axis);
 
     rt.backward_rpm(b);
     lt.backward_rpm(b);
@@ -108,10 +115,7 @@ private:
       pros::delay(5);
       is.update(5);
       moved=is.get_position();
-      net_moved = moved.x_pos-start.x_pos;
-      if(forward_axis==Z_AXIS) {
-        net_moved = moved.z_pos-start.z_pos;
-      }
+      net_moved = moved.get_axis(forward_axis)-start.get_axis(forward_axis);
     }
 
     rt.stop();
@@ -122,12 +126,9 @@ private:
     float dist = inch;
 
     position start = is.get_position();
-    position moved=is.get_position();
+    position moved = is.get_position();
 
-    float net_moved = moved.z_pos-start.z_pos;
-    if(forward_axis ==Z_AXIS) {
-      net_moved = moved.x_pos-start.x_pos;
-    }
+    float net_moved = moved.get_axis(side_axis)-start.get_axis(side_axis);
 
     hd.forward_rpm(b);
 
@@ -135,10 +136,7 @@ private:
       pros::delay(5);
       is.update(5);
       moved=is.get_position();
-      net_moved = moved.z_pos-start.z_pos;
-      if(forward_axis==Z_AXIS) {
-        net_moved = moved.x_pos-start.x_pos;
-      }
+      net_moved = moved.get_axis(side_axis)-start.get_axis(side_axis);
     }
 
     hd.stop();
@@ -150,10 +148,7 @@ private:
     position start = is.get_position();
     position moved= is.get_position();
 
-    float net_moved = moved.z_pos-start.z_pos;
-    if(forward_axis ==Z_AXIS) {
-      net_moved = moved.x_pos-start.x_pos;
-    }
+    float net_moved = moved.get_axis(side_axis)-start.get_axis(side_axis);
 
     hd.backward_rpm(b);
 
@@ -161,10 +156,7 @@ private:
       pros::delay(5);
       is.update(5);
       moved=is.get_position();
-      net_moved = moved.z_pos-start.z_pos;
-      if(forward_axis==Z_AXIS) {
-        net_moved = moved.x_pos-start.x_pos;
-      }
+      net_moved = moved.get_axis(side_axis)-start.get_axis(side_axis);
     }
 
     hd.stop();
@@ -185,6 +177,7 @@ private:
 
 
 
+
 /*
 
 
@@ -202,16 +195,28 @@ public:
   Base(Train r, Train l): rt(r), lt(l) {
     type=2;
   }
-  Base(Train r, Train l, Inertia s, int fw): rt(r), lt(l), is(s), forward_axis(fw) {
+  Base(Train r, Train l, Inertia s, float fw, float sw, float uw): rt(r), lt(l), is(s) {
     type=2;
     hasInertia=true;
+    if(is.validate(fw) && is.validate(sw) && is.validate(uw)) {
+      forward_axis = fw;
+      side_axis = sw;
+      up_axis = uw;
+    }
   }
+
   Base(Train r, Train l, Train h): rt(r), lt(l), hd(h) {
     type=3;
   }
-  Base(Train r, Train l, Train h, Inertia s, int fw): rt(r), lt(l), hd(h), is(s), forward_axis(fw) {
+  
+  Base(Train r, Train l, Train h, Inertia s, int fw, int sw, int uw): rt(r), lt(l), hd(h), is(s) {
     type=3;
     hasInertia=true;
+    if(is.validate(fw) && is.validate(sw) && is.validate(uw)) {
+      forward_axis = fw;
+      side_axis = sw;
+      up_axis = uw;
+    }
   }
 
 

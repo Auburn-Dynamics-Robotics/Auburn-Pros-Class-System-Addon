@@ -15,7 +15,7 @@ Train h_drive(mot_5,100,false);
 
 Inertia inertia(inertia_sensor,0.2);
 
-Base base(right_train,left_train,h_drive,inertia,Z_AXIS);
+Base base(right_train,left_train,h_drive,inertia, X_AXIS, Z_AXIS, Y_AXIS);
 
 
 void left_button_press() {

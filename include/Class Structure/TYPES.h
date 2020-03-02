@@ -12,3 +12,6 @@
 
 #define Z_AXIS 1
 #define X_AXIS 2
+#define Y_AXIS 3
+
+#define INVALID_AXIS 101110101101
